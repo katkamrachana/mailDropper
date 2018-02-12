@@ -20,46 +20,54 @@ import getpass
 import os
 import string 
 
-SMTPserver = 'smtp.gmail.com'
+class mail_Dropper(object):
+    """docstring for mail_Dropper"""
+    def __init__(self, arg):
+        super(mail_Dropper, self).__init__()
+        self.arg = arg
+        
+        self.SMTPserver = 'smtp.gmail.com'
+        try:
+            validation_result = self.validate_args()
+            if validation_result:
+                self.server_conn = smtplib.SMTP()
+                self.server_conn.connect(self.SMTPserver)
+                self.server_conn.starttls()
+                self.server_conn.verify(self.sender_email)
+                self.server_conn.login(self.sender_email, self.sender_pswd)
+        except Exception as ee:
+            print ee
+            print 'Please enter a valid arguments'
+            sys.exit()
 
-# sender_email = raw_input('Enter FROM email address: ')
-
-try:
-    # sender_pswd = getpass.getpass("Please enter your password:")
-    server_conn = smtplib.SMTP()
-    server_conn.connect(SMTPserver)
-    server_conn.starttls()
-    server_conn.verify("katkam.rachana@gmail.com")
-    server_conn.login("katkam.rachana@gmail.com", "anahcar2419")
-
-except Exception as ee:
-    print ee
-    print 'Please enter a valid email address'
-    sys.exit()
-
-
-def maildropper(user_dataset):
-    mail_body = string.join((
-        "From: rachana.katkam@tiss.edu",
-        "To: %s" % user_dataset['EMAIL'],
-        "Subject: %s" % user_dataset['SUBJECT'] ,
-        "\nDear %s," % user_dataset['NAME'],"\n %s" % user_dataset['CONTENT'], " with server: %s" % SMTPserver, 
-        ), "\r\n")
-    server_conn.sendmail("rachana.katkam@tiss.edu", [user_dataset['EMAIL']], mail_body)
-
-def process_csv(filepath):
-    with open(filepath) as csvfile:
-        dataset = csv.DictReader(csvfile)
-        for user_data in dataset:
-            maildropper(user_data)
-
-if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        data_set_fp = sys.argv[1]
-        if os.path.exists(data_set_fp):
-            process_csv(data_set_fp)
-            server_conn.quit()
+    def validate_args(self):
+        args_length = len(self.arg)
+        if args_length:
+            if args_length == 3:
+                self.sender_email = self.arg[0] 
+                self.sender_pswd = self.arg[1] 
+                self.data_set_fp = self.arg[2] 
+                return True
         else:
-            print "\n Please enter absolute path of csv file"
-    else:
-        print "Please enter data-set(.csv) filepath"
+            print "Please enter csv file name"
+            return False
+
+
+    def maildropper(self,user_dataset):
+        mail_body = string.join((
+            "From: %s" % self.sender_email,
+            "To: %s" % user_dataset['EMAIL'],
+            "Subject: %s" % user_dataset['SUBJECT'] ,
+            "\nDear %s," % user_dataset['NAME'],"\n %s" % user_dataset['CONTENT'], " with server: %s" % SMTPserver, 
+            ), "\r\n")
+        self.server_conn.sendmail(self.sender_email, [user_dataset['EMAIL']], mail_body)
+
+    def process_csv(self):
+        with open(self.data_set_fps) as csvfile:
+            dataset = csv.DictReader(csvfile)
+            for user_data in dataset:
+                self.maildropper(user_data)
+        self.server_conn.quit()
+
+    # sender_email = raw_input('Enter FROM email address: ')
+    # sender_pswd = getpass.getpass("Please enter your password:")
