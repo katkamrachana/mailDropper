@@ -63,7 +63,7 @@ class mail_Dropper(object):
             "From: %s" % self.sender_email,
             "To: %s" % user_dataset['EMAIL'],
             "Subject: %s" % user_dataset['SUBJECT'] ,
-            "\nDear %s," % user_dataset['NAME'],"\n %s" % user_dataset['CONTENT'], " with server: %s" % self.SMTPserver, 
+            "\nDear %s," % user_dataset['NAME'],"\n %s" % user_dataset['CONTENT'], 
             ), "\r\n")
         print "\n ----- Mail body BEGINS here ----"
         print mail_body

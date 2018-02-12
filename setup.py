@@ -4,7 +4,7 @@ def readme():
         return f.read()
 setup(
     name='mailDropper',
-    version='1.0.1',
+    version='1.1.1',
     author='katkamrachana',
     author_email='katkam.rachana@gmail.com',
     license='AGPL',
