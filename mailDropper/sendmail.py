@@ -36,8 +36,7 @@ class mail_Dropper(object):
                 self.server_conn.login(self.sender_email, self.sender_pswd)
                 print " Success!"
 
-        except Exception as ee:
-            print ee
+        except Exception as constructor_err:
             print 'Please enter a valid arguments'
             sys.exit()
 
@@ -83,8 +82,7 @@ class mail_Dropper(object):
                 self.server_conn.quit()
             else:
                 self.process_csv()
-        except Exception as e:
-            print e
+        except Exception as data_processing_err:
             print "\n Something went wrong. Please try again"
             self.process_csv()
             pass
