@@ -4,10 +4,10 @@ def readme():
         return f.read()
 setup(
     name='mailDropper',
-    version='1.1.1',
+    version='1.0',
     author='katkamrachana',
     author_email='katkam.rachana@gmail.com',
-    license='AGPL',
+    license='AGPL 3.0',
     long_description=readme(),
     include_package_data=True,
     packages=["mailDropper"],
