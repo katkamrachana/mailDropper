@@ -1,16 +1,13 @@
 '''
-Sample run command: python sendmail.py /home/rbk/rachana/Documents/data_sets/dataset.csv
-What is maildropper?
-    - It sends mail in bulk reading through a dataset.
-    - It lands mails in inbox, not spam!
-How does maildropper work?
-    1. Asks to input from-email address and password.
-    2. Verifies validity of from-email address and proceeds only on success.
-    3. Reads dataset.csv having columns:
-        EMAIL|NAME|SUBJECT|CONTENT
-    4. Sends mail in following pattern:
-        Dear <NAME>,
-            <CONTENT>
+How to run:
+Needs python shell.
+1. import <me>
+    `from mailDropper.sendmail import mail_Dropper`
+2. Instatitate to verify and establish connection
+    `md_obj = mail_Dropper("<sender_email_id>", "<sender_email_password>")`
+3. Start sending mails
+    `md_obj.process_csv("<absolute file path>")`
+
 '''
 
 import smtplib
@@ -25,21 +22,20 @@ class mail_Dropper(object):
     def __init__(self, *args):
         # super(mail_Dropper, self).__init__()
         self.args = args
-        print args
-        
         self.SMTPserver = 'smtp.gmail.com'
         try:
+            print "\nValidating arguments. Please wait.... "
             validation_result = self.validate_args()
-            print "\nValidating arguments. Please wait.... ", 
             if validation_result:
                 print " Success!"
-                print "\nEstablishing SMTP connection...",
+                print "\nEstablishing SMTP connection..."
                 self.server_conn = smtplib.SMTP()
                 self.server_conn.connect(self.SMTPserver)
                 self.server_conn.starttls()
                 self.server_conn.verify(self.sender_email)
                 self.server_conn.login(self.sender_email, self.sender_pswd)
                 print " Success!"
+
         except Exception as ee:
             print ee
             print 'Please enter a valid arguments'
@@ -48,14 +44,12 @@ class mail_Dropper(object):
     def validate_args(self):
         args_length = len(self.args)
         if args_length:
-            if args_length == 3:
+            if args_length == 2:
                 self.sender_email = self.args[0] 
                 self.sender_pswd = self.args[1] 
-                self.data_set_fp = self.args[2] 
                 return True
-        else:
-            print "Please enter csv file name"
-            return False
+        print "Please enter email and password"
+        return False
 
 
     def maildropper(self,user_dataset):
@@ -71,15 +65,29 @@ class mail_Dropper(object):
         self.server_conn.sendmail(self.sender_email, [user_dataset['EMAIL']], mail_body)
 
     def process_csv(self):
-        with open(self.data_set_fp) as csvfile:
-            dataset = csv.DictReader(csvfile)
-            print "\n Sending Email Notifications initiated."
-            for user_data in dataset:
-                self.maildropper(user_data)
+        try:
+            self.server_conn.ehlo()
+        except Exception as e:
+            print "The connection seems to be closed. Please re-establish."
+            sys.exit()
+        try:
+            self.data_set_fp = raw_input('Enter ABSOLUTE csv file path: ')
+            with open(self.data_set_fp) as csvfile:
+                dataset = csv.DictReader(csvfile)
+                print "\n Sending Email Notifications initiated."
+                for user_data in dataset:
+                    self.maildropper(user_data)
             print "\n Sending Email Notifications finished."
             self.close_conn = raw_input("Enter c/C to continue processing another data-set or anyother key to close the connection.")
             if self.close_conn not in ['c', 'C']:
                 self.server_conn.quit()
+            else:
+                self.process_csv()
+        except Exception as e:
+            print e
+            print "\n Something went wrong. Please try again"
+            self.process_csv()
+            pass
 
     # sender_email = raw_input('Enter FROM email address: ')
     # sender_pswd = getpass.getpass("Please enter your password:")
