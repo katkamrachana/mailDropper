@@ -11,10 +11,6 @@ import json
 import smtplib
 import csv
 import sys
-import getpass
-import os
-import string 
-from datetime import datetime
 
 class mail_Dropper(object):
     """
@@ -47,10 +43,7 @@ class mail_Dropper(object):
                 self.sender_pswd = self.cred_dict.get("password")
                 self.server_conn.verify(self.sender_email)
                 self.server_conn.login(self.sender_email, self.sender_pswd)
-                d = datetime.now()
                 self.process_csv()
-                d1 = datetime.now()
-                print(d1-d)
                 return True
         except Exception as e:
             print('ValidationError: Please input valid credentials',e)
